@@ -2,8 +2,8 @@
 
 ### Desktop
 
-<video src="movies/Desktop.mov" autoplay loop muted playsinline></video>
+![Desktop](movies/Desktop.gif)
 
 ### Mobile
 
-<video src="movies/Mobile.mov" autoplay loop muted playsinline></video>
+![Mobile](movies/Mobile.gif)
