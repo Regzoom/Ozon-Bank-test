@@ -110,20 +110,8 @@ body {
   initial-value: 0;
 }
 
-@property --arc-start {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@property --arc-len {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 5;
-}
-
 .progress-ring {
-  --progress: 60;
+  --progress: 0;
   width: 140px;
   height: 140px;
   border-radius: 50%;
@@ -132,50 +120,20 @@ body {
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #000 calc(100% - 10px));
   mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #000 calc(100% - 10px));
   flex-shrink: 0;
-  transition: --progress 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.4s ease,
-    transform 0.4s ease;
+  transition: --progress 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   filter: drop-shadow(0 0 6px var(--arc-fill-glow));
 }
 
 .progress-ring.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.88);
+  visibility: hidden;
 }
 
 .progress-ring.animated {
-  background: conic-gradient(from var(--arc-start),
-      var(--arc-fill) calc(var(--arc-len) * 1%),
-      var(--arc-track) calc(var(--arc-len) * 1%));
-  animation:
-    loading-rotate 2s linear infinite,
-    loading-stretch 2s ease-in-out infinite;
+  animation: spin 2s linear infinite;
 }
 
-@keyframes loading-rotate {
-  from {
-    --arc-start: 0deg;
-  }
-
+@keyframes spin {
   to {
-    --arc-start: 360deg;
-  }
-}
-
-@keyframes loading-stretch {
-  0% {
-    --arc-len: 5;
-    transform: rotate(0deg);
-  }
-
-  50% {
-    --arc-len: 65;
-    transform: rotate(90deg);
-  }
-
-  100% {
-    --arc-len: 5;
     transform: rotate(360deg);
   }
 }

@@ -1,59 +1,128 @@
-const Progress = (function () {
-    const ring = document.getElementById('progressRing');
+class Progress {
+    constructor(container) {
+        this._value = 0;
+        this._animated = false;
+        this._hidden = false;
 
-    let _value = 60;
-    let _animated = false;
-    let _hidden = false;
+        var card = document.createElement('div');
+        card.className = 'card';
 
-    ring.style.setProperty('--progress', _value);
+        var label = document.createElement('span');
+        label.className = 'card-label';
+        label.textContent = 'Progress';
+        card.appendChild(label);
 
-    function setValue(v) {
+        var progressArea = document.createElement('div');
+        progressArea.className = 'progress-area';
+        var ring = document.createElement('div');
+        ring.className = 'progress-ring';
+        progressArea.appendChild(ring);
+        card.appendChild(progressArea);
+        this._ring = ring;
+
+        var controlsArea = document.createElement('div');
+        controlsArea.className = 'controls-area';
+
+        var valueInput = this._createValueRow(controlsArea);
+        this._createToggleRow(controlsArea, 'Animate', function (checked) {
+            this.setAnimated(checked);
+        }.bind(this));
+        this._createToggleRow(controlsArea, 'Hide', function (checked) {
+            this.setHidden(checked);
+        }.bind(this));
+
+        card.appendChild(controlsArea);
+        container.appendChild(card);
+
+        this._valueInput = valueInput;
+        this.setValue(0);
+    }
+
+    _createValueRow(parent) {
+        var row = document.createElement('div');
+        row.className = 'control-row';
+
+        var input = document.createElement('input');
+        input.className = 'value-input';
+        input.type = 'number';
+        input.min = '0';
+        input.max = '100';
+
+        var self = this;
+        input.addEventListener('input', function () {
+            var v = parseInt(this.value, 10);
+            if (isNaN(v)) return;
+            if (v < 0) { v = 0; this.value = 0; }
+            if (v > 100) { v = 100; this.value = 100; }
+            self.setValue(v);
+        });
+        input.addEventListener('blur', function () {
+            if (this.value === '' || isNaN(parseInt(this.value, 10))) {
+                this.value = self.getValue();
+            }
+        });
+
+        var label = document.createElement('span');
+        label.className = 'control-label';
+        label.textContent = 'Value';
+
+        row.appendChild(input);
+        row.appendChild(label);
+        parent.appendChild(row);
+        return input;
+    }
+
+    _createToggleRow(parent, text, onChange) {
+        var row = document.createElement('div');
+        row.className = 'control-row';
+
+        var toggle = document.createElement('label');
+        toggle.className = 'toggle';
+
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.addEventListener('change', function () {
+            onChange(this.checked);
+        });
+
+        var track = document.createElement('span');
+        track.className = 'toggle-track';
+        var thumb = document.createElement('span');
+        thumb.className = 'toggle-thumb';
+
+        toggle.appendChild(checkbox);
+        toggle.appendChild(track);
+        toggle.appendChild(thumb);
+
+        var label = document.createElement('span');
+        label.className = 'control-label';
+        label.textContent = text;
+
+        row.appendChild(toggle);
+        row.appendChild(label);
+        parent.appendChild(row);
+    }
+
+    setValue(v) {
         v = Math.max(0, Math.min(100, Number(v) || 0));
-        _value = v;
-        ring.style.setProperty('--progress', v);
+        this._value = v;
+        this._ring.style.setProperty('--progress', v);
+        this._valueInput.value = v;
     }
 
-    function setAnimated(on) {
-        _animated = !!on;
-        ring.classList.toggle('animated', _animated);
+    setAnimated(on) {
+        this._animated = !!on;
+        this._ring.classList.toggle('animated', this._animated);
     }
 
-    function setHidden(on) {
-        _hidden = !!on;
-        ring.classList.toggle('hidden', _hidden);
+    setHidden(on) {
+        this._hidden = !!on;
+        this._ring.classList.toggle('hidden', this._hidden);
     }
 
-    function getValue() { return _value; }
-    function isAnimated() { return _animated; }
-    function isHidden() { return _hidden; }
+    getValue() { return this._value; }
+    isAnimated() { return this._animated; }
+    isHidden() { return this._hidden; }
+}
 
-    return { setValue, setAnimated, setHidden, getValue, isAnimated, isHidden };
-})();
-
-const valueInput = document.getElementById('valueInput');
-const animateToggle = document.getElementById('animateToggle');
-const hideToggle = document.getElementById('hideToggle');
-
-valueInput.value = Progress.getValue();
-
-valueInput.addEventListener('input', function () {
-    let v = parseInt(this.value, 10);
-    if (isNaN(v)) return;
-    if (v < 0) { v = 0; this.value = 0; }
-    if (v > 100) { v = 100; this.value = 100; }
-    Progress.setValue(v);
-});
-
-valueInput.addEventListener('blur', function () {
-    if (this.value === '' || isNaN(parseInt(this.value, 10))) {
-        this.value = Progress.getValue();
-    }
-});
-
-animateToggle.addEventListener('change', function () {
-    Progress.setAnimated(this.checked);
-});
-
-hideToggle.addEventListener('change', function () {
-    Progress.setHidden(this.checked);
-});
+new Progress(document.getElementById('progress'));
